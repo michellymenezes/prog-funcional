@@ -1,0 +1,22 @@
+{
+  "files": {
+    "test.js": {
+      "category": "public",
+      "data": "// m\u00f3dulos node\nconst assert = require('assert');\nconst fs = require('fs');\n\nprocess.on('uncaughtException', function (e) {\n    console.log(e);\n});\n\n// arquivo a testar \u00e9 inclu\u00eddo como string... \n//eval(fs.readFileSync('polinomios.js').toString());\nvar cut = process.argv[process.argv.length - 1];\nif (!cut.endsWith('solucao.js')) {\n    cut = process.argv[process.argv.length - 1];\n};\n\nconst original = fs.readFileSync(cut, 'utf8');\nconst linhas = original.split(/\\r?\\n/);\nconst uteis = linhas.map(l => l.replace(/# .*: .*$|####$/, ''));\nconst code = uteis.join('\\n');\neval(code);\n\ndescribe('fibonacci recurs\u00e3o de cauda', function (){\n\n    it('\u00fanico ponto v\u00e1lido define a m\u00e9dia', function () {\n        assert.equal(media_distancias([[3, 4]], 100), 5.0);\n        assert.equal(media_distancias([[6, 8]], 100), 10.0);\n    });\n\n    it('dois pontos v\u00e1lidos', function () {\n        assert.equal(media_distancias([[3, 4], [6, 8]], 100), 7.5);\n        assert.equal(media_distancias([[4, 3], [8, 6]], 100), 7.5);\n    });\n\n    it('tr\u00eas pontos', function () {\n        assert.equal(media_distancias([[3, 4], [6, 8], [12, 9]], 100), 10.0);\n    });\n\n    it('pontos nos quadrantes errados s\u00e3o descartados', function () {\n        assert.equal(media_distancias([[-3, 4], [3, 4], [6, 8], [12, 9]], 100), 10.0);\n        assert.equal(media_distancias([[3, 4], [3, -4], [6, 8], [12, 9]], 100), 10.0);\n        assert.equal(media_distancias([[3, 4], [6, 8], [12, 9], [-3, -4]], 100), 10.0);\n    });\n\n    it('pontos distantes demais s\u00e3o descartados', function () {\n        assert.equal(media_distancias([[300, 400], [3, 4], [6, 8], [12, 9]], 100), 10.0);\n        assert.equal(media_distancias([[3, 4], [300, 400], [6, 8], [12, 9]], 100), 10.0);\n        assert.equal(media_distancias([[3, 4], [6, 8], [12, 9], [300, 400]], 100), 10.0);\n    });\n\n    it('media \u00e9 NaN se todos os pontos s\u00e3o descartados', function () {\n        assert(Number.isNaN(media_distancias([[300, 400]], 10)));\n    });\n\n});\n"
+    },
+    "runner.js": {
+      "category": "public",
+      "data": "var Mocha = require('mocha'),\n    fs = require('fs'),\n    path = require('path');\n\nvar tests_script = path.join(__dirname, 'test.js');\n\nvar files = fs.readdirSync(__dirname).filter(function(file){\n    // Only keep the .js files\n    return file.substr(-3) === '.js';\n});\n\nfiles.forEach(function () {\n    // create quiet mocha instance\n    var mocha = new Mocha({ reporter: function () {} }) // no logs\n\n    // add test script to mocha instance\n    mocha.addFile(tests_script);\n    mocha.run()\n        .on('pass', function(test) {\n            process.stdout.write(\".\");\n        })\n        .on('fail', function(test, err) {\n            process.stdout.write(\"f\");\n        })\n        .on('end', function(test, err) {\n            process.stdout.write(\"\\n\");\n        });\n});\n"
+    },
+    "solucao.js": {
+      "category": "answer",
+      "data": "function media_distancias(pontos, d){\n  pontos =  pontos.filter((e)=> e[0] > 0 & e[1] > 0 )\n                  .map(e => Math.sqrt((e[0]*e[0]) + (e[1] * e[1])))\n                  .filter(e => e < d)\n\n  soma = pontos.reduce((a,e) => {return a+e}, 0)\n  return soma/pontos.length\n}\n",
+      "name": "solucao.js"
+    }
+  },
+  "kind": "assignment",
+  "name": null,
+  "checksum": "593e7ab0241cf523c651df58b8f2ddaa",
+  "iid": 4998458184302592,
+  "activity_revision": "1.0.0"
+}
