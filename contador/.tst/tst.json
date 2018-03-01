@@ -1,0 +1,25 @@
+{
+  "files": {
+    "test.js": {
+      "category": "public",
+      "data": "// m\u00f3dulos node\nconst assert = require('assert');\nconst fs = require('fs');\n\nprocess.on('uncaughtException', function (e) {\n    console.log(e);\n});\n\n// arquivo a testar \u00e9 inclu\u00eddo como string... \nvar cut = process.argv[process.argv.length - 1];\n\nconst original = fs.readFileSync(cut, 'utf8');\nconst linhas = original.split(/\\r?\\n/);\nconst uteis = linhas.map(l => l.replace(/# .*: .*$|####$/, ''));\nconst code = uteis.join('\\n');\neval(code);\n\n// update (mock para testes)\nvar count;\nfunction update() {\n    count += 1;\n}\n\ndescribe('', function (){\n\n    it('update n\u00e3o \u00e9 chamado antes de start', function () {\n        //start(50);\n        count = 0;\n        return new Promise(function(resolve, reject) {\n            setTimeout(() => {stop(); resolve()}, 500);\n        }).then(function () {\n            assert(true);\n            assert(count === 0);\n        });\n    });\n\n    it('start chama update pelo menos 5 vezes', function () {\n        count = 0;\n        start(50);\n        return new Promise(function(resolve, reject) {\n            setTimeout(() => {stop(); resolve()}, 600);\n        }).then(function () {\n            assert(true);\n            assert(count > 10);\n        });\n    });\n\n    it('start n\u00e3o tem efeito se invocado mais de uma vez seguida', function () {\n        count = 0;\n        start(100); // primeira chamada ok\n        start(10);  // chamada a ser ignorada\n        return new Promise(function(resolve, reject) {\n            setTimeout(() => {stop(); resolve()}, 600);\n        }).then(function () {\n            assert(true);\n            assert(count < 10);\n        });\n    });\n\n    it('stop para a contagem', function () {\n        var count_final;\n        count = 0;\n        start(30); \n        return new Promise(function(resolve, reject) {\n            // deixa rodar por 300ms antes de stop()\n            setTimeout(() => {\n                stop();\n                count_final = count;\n                resolve()\n            }, 300);\n        }).then(function () {\n            // deixa rodar por mais 300ms depois do stop()\n            setTimeout(() => {\n                assert.equal(count, count_final);\n            }, 300);\n        });\n    });\n\n\n});\n"
+    },
+    "runner.js": {
+      "category": "public",
+      "data": "var Mocha = require('mocha'),\n    fs = require('fs'),\n    path = require('path');\n\nvar tests_script = path.join(__dirname, 'test.js');\n\nvar files = fs.readdirSync(__dirname).filter(function(file){\n    // Only keep the .js files\n    return file.substr(-3) === '.js';\n});\n\nfiles.forEach(function () {\n    // create quiet mocha instance\n    var mocha = new Mocha({ reporter: function () {} }) // no logs\n\n    // add test script to mocha instance\n    mocha.addFile(tests_script);\n    mocha.run()\n        .on('pass', function(test) {\n            process.stdout.write(\".\");\n        })\n        .on('fail', function(test, err) {\n            process.stdout.write(\"f\");\n        })\n        .on('end', function(test, err) {\n            process.stdout.write(\"\\n\");\n        });\n});\n"
+    },
+    "contador.js": {
+      "category": "answer",
+      "data": "var intervalo;\nvar state = \"stopped\";\nfunction start(tempo){\n  if( state == \"stopped\"){\n    intervalo = setInterval('update()', tempo);\n    state = \"running\"\n  }\n}\n\nfunction stop(){\n    state = \"stopped\"\n    clearInterval(intervalo);\n}\n",
+      "name": "contador.js"
+    },
+    "contador.html": {
+      "category": "public",
+      "data": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>exerc\u00edcio 1</title>\n</head>\n\n<body>\n  <button onclick=\"start(1000)\">start</button>\n  <button onclick=\"stop()\">stop</button>\n  <button onclick=\"reset()\">reset</button>\n\n  <h1 id=\"display\"></h1>\n\n  <script>\n    const display = document.getElementById('display');\n    display.innerText = \"0\";\n\n    function update() {\n        display.innerText = parseInt(display.innerText) + 1;\n    }\n\n    function reset() {\n        if (state == \"stopped\") {\n            display.innerText = \"0\";\n        }\n    }\n  </script>\n\n  <script src=\"contador.js\"></script>\n</body>\n\n</html>\n"
+    }
+  },
+  "iid": 6411059338412032,
+  "kind": "assignment",
+  "activity_revision": "1.0.4",
+  "name": null
+}

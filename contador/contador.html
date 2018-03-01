@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>exercício 1</title>
+</head>
+
+<body>
+  <button onclick="start(1000)">start</button>
+  <button onclick="stop()">stop</button>
+  <button onclick="reset()">reset</button>
+
+  <h1 id="display"></h1>
+
+  <script>
+    const display = document.getElementById('display');
+    display.innerText = "0";
+
+    function update() {
+        display.innerText = parseInt(display.innerText) + 1;
+    }
+
+    function reset() {
+        if (state == "stopped") {
+            display.innerText = "0";
+        }
+    }
+  </script>
+
+  <script src="contador.js"></script>
+</body>
+
+</html>
