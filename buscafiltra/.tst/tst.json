@@ -1,0 +1,22 @@
+{
+  "files": {
+    "test.js": {
+      "category": "public",
+      "data": "// m\u00f3dulos node\nconst assert = require('assert');\nconst fs = require('fs');\n\nprocess.on('uncaughtException', function (e) {\n    console.log(e);\n});\n\n// arquivo a testar \u00e9 inclu\u00eddo como string... \nvar cut = process.argv[process.argv.length - 1];\n\nconst original = fs.readFileSync(cut, 'utf8');\nconst linhas = original.split(/\\r?\\n/);\nconst uteis = linhas.map(l => l.replace(/# .*: .*$|####$/, ''));\nconst code = uteis.join('\\n');\neval(code);\n\ndescribe('busca e filtra recursos rest', function (){\n\n    it('a fun\u00e7\u00e3o recebe url e retorna uma Promise', function () {\n        var p = busca_e_filtra('http://www.dsc.ufcg.edu.br/~dalton/prog3')\n                .catch(() => {});\n\n        assert(p instanceof Promise);\n    });\n\n    it('filtra valores entre 12 e 16', function () {\n        var p = busca_e_filtra('http://www.dsc.ufcg.edu.br/~dalton/prog3/caso1');\n\n        return p.then(function (dados) {\n            assert.deepEqual(dados, [16, 12, 14, 16, 15]);\n        });\n    });\n\n    it('filtra valores entre 5 e 16', function () {\n        var p = busca_e_filtra('http://www.dsc.ufcg.edu.br/~dalton/prog3/caso2');\n\n        return p.then(function (dados) {\n            assert.deepEqual(dados, [10, 8, 7, 11, 16, 12, 14, 5, 11, 9, 16, 15]);\n        });\n    });\n\n    it('filtra valores entre 16 e 30', function () {\n        var p = busca_e_filtra('http://www.dsc.ufcg.edu.br/~dalton/prog3/caso3');\n\n        return p.then(function (dados) {\n            assert.deepEqual(dados, [16, 18, 16]);\n        });\n    });\n\n});\n"
+    },
+    "runner.js": {
+      "category": "public",
+      "data": "var Mocha = require('mocha'),\n    fs = require('fs'),\n    path = require('path');\n\nvar tests_script = path.join(__dirname, 'test.js');\n\nvar files = fs.readdirSync(__dirname).filter(function(file){\n    // Only keep the .js files\n    return file.substr(-3) === '.js';\n});\n\nfiles.forEach(function () {\n    // create quiet mocha instance\n    var mocha = new Mocha({ reporter: function () {} }) // no logs\n\n    // add test script to mocha instance\n    mocha.addFile(tests_script);\n    mocha.run()\n        .on('pass', function(test) {\n            process.stdout.write(\".\");\n        })\n        .on('fail', function(test, err) {\n            process.stdout.write(\"f\");\n        })\n        .on('end', function(test, err) {\n            process.stdout.write(\"\\n\");\n        });\n});\n"
+    },
+    "buscaFiltra.js": {
+      "category": "answer",
+      "data": "const fetch = require('node-fetch');\n\nmodule.exports = busca_e_filtra = (url_base) => {\n  return fetch(url_base + '/data')\n          .then(response => response.json())\n          .then(body => {\n            return fetch(url_base + '/' + body.recurso)\n                    .then(response => response.json())\n                    .then(data => {\n                      data = data.filter((value) => {\n                        return (value <= body.maximo & value >= body.minimo);\n                      });\n\n                      let promise = new Promise((resolve, reject) => {\n                        resolve(data);\n                      });\n                      return promise;\n                    })\n\n          })\n          .catch(() => new Promise((resolve, reject) => reject()));\n}\n",
+      "name": "buscaFiltra.js"
+    }
+  },
+  "kind": "assignment",
+  "name": null,
+  "checksum": "9dc909ed98291a70e1b7d26666cf79d1",
+  "iid": 5254493365075968,
+  "activity_revision": "1.0.0"
+}
