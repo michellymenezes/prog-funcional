@@ -1,0 +1,22 @@
+{
+  "files": {
+    "test.js": {
+      "category": "public",
+      "data": "// m\u00f3dulos node\nconst assert = require('assert');\nconst fs = require('fs');\n\nprocess.on('uncaughtException', function (e) {\n    console.log(e);\n});\n\n// arquivo a testar \u00e9 inclu\u00eddo como string... \n//eval(fs.readFileSync('polinomios.js').toString());\nvar cut = process.argv[process.argv.length - 1];\n//if (!cut.endsWith('fibonacci.js')) {\n//    cut = process.argv[process.argv.length - 1];\n//};\n\nconst original = fs.readFileSync(cut, 'utf8');\nconst linhas = original.split(/\\r?\\n/);\nconst uteis = linhas.map(l => l.replace(/# .*: .*$|####$/, ''));\nconst code = uteis.join('\\n');\neval(code);\n\ndescribe('fibonacci recurs\u00e3o de cauda', function (){\n\n    it('exemplo simples 1', function () {\n        assert.equal(fib(10), 89);\n    });\n\n    it('exemplo simples 2', function () {\n        assert.equal(fib(20), 10946);\n    });\n\n    it('exemplo complexo 2: timeout pra algoritmo errado', function () {\n        assert.equal(fib(85), 420196140727489660);\n    });\n\n    it('exemplo complexo 1: timeout pra algoritmo errado', function () {\n        assert.equal(fib(100), 573147844013817200000);\n    });\n\n});\n"
+    },
+    "runner.js": {
+      "category": "public",
+      "data": "var Mocha = require('mocha'),\n    fs = require('fs'),\n    path = require('path');\n\nvar tests_script = path.join(__dirname, 'test.js');\n\nvar files = fs.readdirSync(__dirname).filter(function(file){\n    // Only keep the .js files\n    return file.substr(-3) === '.js';\n});\n\nfiles.forEach(function () {\n    // create quiet mocha instance\n    var mocha = new Mocha({ reporter: function () {} }) // no logs\n\n    // add test script to mocha instance\n    mocha.addFile(tests_script);\n    mocha.run()\n        .on('pass', function(test) {\n            process.stdout.write(\".\");\n        })\n        .on('fail', function(test, err) {\n            process.stdout.write(\"f\");\n        })\n        .on('end', function(test, err) {\n            process.stdout.write(\"\\n\");\n        });\n});\n"
+    },
+    "fibonacci.js": {
+      "category": "answer",
+      "data": "// Martha Michelly, Samir Silva\n\nfunction fib(n){\n\n  function auxFib(a, b, contador){\n    if(contador === n) return b;\n    return auxFib(b, a + b, contador + 1);\n  }\n\nreturn auxFib(0, 1, 0)\n}\n",
+      "name": "fibonacci.js"
+    }
+  },
+  "kind": "assignment",
+  "name": null,
+  "checksum": "2a8b8287b08ea7a2fbee96e61e905107",
+  "iid": 5910273936326656,
+  "activity_revision": "1.1.0"
+}
